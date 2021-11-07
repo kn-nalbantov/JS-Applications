@@ -19,6 +19,9 @@ async function loadBooks() {
     }
     const data = await res.json();
 
+    tbody.replaceChildren();
+    // renderBook('Harry Poter', 'J. K. Rowling');
+    // renderBook('Game of Thrones', 'George R. R. Martin');
     for (let book in data) {
       const title = data[book].title;
       const author = data[book].author;
@@ -52,12 +55,79 @@ function renderBook(title, author) {
   tbody.appendChild(tr);
 }
 
-function editBook() {
-  console.log('edited');
+function editBook(e) {
+  form.children[0].textContent = 'Edit FORM';
+  const oldTitle = (form.title.value = e.target.parentNode.parentNode.children[0].textContent);
+  form.author.value = e.target.parentNode.parentNode.children[1].textContent;
+
+  form.removeEventListener('submit', createBook);
+  form.addEventListener('submit', submitEditedBook);
+
+  async function submitEditedBook(e) {
+    e.preventDefault();
+
+    try {
+      const title = form.title.value;
+      const author = form.author.value;
+
+      const options = {
+        method: 'put',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, author }),
+      };
+      const res = await fetch('http://localhost:3030/jsonstore/collections/books/' + (await getID(oldTitle)), options);
+      if (res.status != 200) {
+        throw new Error(res.statusText);
+      }
+      const data = await res.json();
+
+      loadBooks();
+    } catch (err) {
+      console.error(err);
+    }
+
+    form.children[0].textContent = 'FORM';
+    form.title.value = '';
+    form.author.value = '';
+    form.removeEventListener('submit', submitEditedBook);
+    form.addEventListener('submit', createBook);
+  }
 }
 
-function deleteBook() {
-  console.log('deleted');
+async function getID(title) {
+  try {
+    const resID = await fetch('http://localhost:3030/jsonstore/collections/books/');
+    if (resID.status != 200) {
+      throw new Error(res.statusText);
+    }
+    const dataID = await resID.json();
+
+    for (let book in dataID) {
+      if (dataID[book].title == title) {
+        return book;
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function deleteBook(e) {
+  const title = e.target.parentNode.parentNode.children[0].textContent;
+  try {
+    const options = {
+      method: 'delete',
+    };
+    const res = await fetch('http://localhost:3030/jsonstore/collections/books/' + (await getID(title)), options);
+    if (res.status != 200) {
+      throw new Error(res.statusText);
+    }
+    loadBooks();
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 async function createBook(e) {
