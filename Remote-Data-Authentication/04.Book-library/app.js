@@ -3,13 +3,9 @@ const tbody = document.querySelector('tbody');
 const form = document.querySelector('form');
 form.addEventListener('submit', createBook);
 
-document.querySelectorAll('tbody td button').forEach(button => {
-  if (button.textContent == 'Edit') {
-    button.addEventListener('click', editBook);
-  } else {
-    button.addEventListener('click', deleteBook);
-  }
-});
+window.onload = () => {
+  loadBooks();
+}
 
 async function loadBooks() {
   try {
@@ -84,15 +80,16 @@ function editBook(e) {
       const data = await res.json();
 
       loadBooks();
+      
+      form.children[0].textContent = 'FORM';
+      form.title.value = '';
+      form.author.value = '';
+      form.removeEventListener('submit', submitEditedBook);
+      form.addEventListener('submit', createBook);
     } catch (err) {
       console.error(err);
     }
 
-    form.children[0].textContent = 'FORM';
-    form.title.value = '';
-    form.author.value = '';
-    form.removeEventListener('submit', submitEditedBook);
-    form.addEventListener('submit', createBook);
   }
 }
 
