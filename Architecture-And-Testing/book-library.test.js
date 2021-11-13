@@ -33,7 +33,7 @@ describe('Book-Library tests', async function () {
   this.timeout(60000);
 
   before(async () => {
-    // browser = await chromium.launch({headless: false, slowMo: 1500});
+    // browser = await chromium.launch({ headless: false, slowMo: 1500, devtools: true });
     browser = await chromium.launch();
   });
 
@@ -49,7 +49,7 @@ describe('Book-Library tests', async function () {
     await page.close();
   });
 
-  describe('load books tests', async function () {
+  describe('load books tests', async () => {
     it('loads books', async () => {
       await page.route('**/jsonstore/collections/books*', route => {
         route.fulfill(json(mockData));
@@ -67,7 +67,7 @@ describe('Book-Library tests', async function () {
     });
   });
 
-  describe('add books tests', async function () {
+  describe('add books tests', async () => {
     it('adds books via post request', async () => {
       await page.route('**/jsonstore/collections/books*', route => {
         route.fulfill(json({ title: 'Title', author: 'Author' }));
@@ -85,6 +85,9 @@ describe('Book-Library tests', async function () {
       expect(request.method()).to.be.equal('POST');
       expect(data.title).to.be.equal('Title');
       expect(data.author).to.be.equal('Author');
+
+      await page.waitForTimeOut(15000)
+
     });
 
     it('alerts an error message if input fields are blank', async () => {
@@ -115,10 +118,9 @@ describe('Book-Library tests', async function () {
 
       expect(await page.isVisible('form#editForm')).to.be.true;
 
-        // await page.waitForTimeOut(15000)
     });
 
-    it.only('input fields on the edit form show the author and title of the selected book', async () => {
+    it('input fields on the edit form show the author and title of the selected book', async () => {
       await page.route('**/jsonstore/collections/books*', route => {
         route.fulfill(json(mockData));
       });
@@ -126,20 +128,70 @@ describe('Book-Library tests', async function () {
       await page.click('text=Load All Books');
       await page.waitForSelector('text=Harry Potter');
       await page.click('[data-id=d953e5fb-a585-4d6b-92d3-ee90697398a0] >> text=Edit');
+      await page.waitForSelector('text=Edit Form');
 
+      const titleInput = await page.inputValue('form#editForm >> [name=title]');
+      const authorInput = await page.inputValue('form#editForm >> [name=author]');
 
-      const searchValue = await page.$eval('form#editForm >> text=Harry', el => el.value);
-
-    //   await page.waitForTimeOut(15000)
-
+      expect(titleInput).to.be.equal("Harry Potter and the Philosopher's Stone");
+      expect(authorInput).to.be.equal('J.K.Rowling');
     });
 
-    it('put request with corect params is sent to the back-end', async () => {
-      //
+    it('sends put request with corect params to the back-end', async () => {
+      await page.route('**/jsonstore/collections/books*', route => {
+        route.fulfill(json(mockData));
+      });
+      await page.goto(host);
+      await page.click('text=Load All Books');
+      await page.waitForSelector('text=Harry Potter');
+      await page.click('[data-id=d953e5fb-a585-4d6b-92d3-ee90697398a0] >> text=Edit');
+      await page.waitForSelector('text=Edit Form');
+      const [request] = await Promise.all([
+        page.waitForRequest(request => request.method() == 'PUT'),
+        await page.click('text=Save'),
+      ]);
+      expect(request.postData()).to.be.equal(
+        JSON.stringify({ title: "Harry Potter and the Philosopher's Stone", author: 'J.K.Rowling' })
+      );
+      expect(request.method() == 'PUT').to.be.true;
     });
   });
 
-  it('deletes a book', async () => {
-    //
+  describe('delete book tests', async () => {
+    it('shows confirmation dialog before deleting a book', async () => {
+      await page.route('**/jsonstore/collections/books*', route => {
+        route.fulfill(json(mockData));
+      });
+      await page.goto(host);
+      await page.click('text=Load All Books');
+      await page.waitForSelector('text=Harry Potter');
+
+      let dialogMessage = '';
+      page.on('dialog', async dialog => {
+        dialogMessage = dialog.message();
+        await dialog.accept();
+      });
+      await page.click('[data-id=d953e5fb-a585-4d6b-92d3-ee90697398a0] >> text=Delete');
+
+      expect(dialogMessage).to.contain('Are you sure');
+    });
+
+    it('sends a delete request to the backend', async () => {
+      await page.route('**/jsonstore/collections/books*', route => {
+        route.fulfill(json(mockData));
+      });
+      await page.goto(host);
+      await page.click('text=Load All Books');
+      await page.waitForSelector('text=Harry Potter');
+
+      page.on('dialog', async dialog => await dialog.accept());
+
+      const [request] = await Promise.all([
+        page.waitForRequest(request => request.method() == 'DELETE'),
+        await page.click('[data-id=d953e5fb-a585-4d6b-92d3-ee90697398a0] >> text=Delete'),
+      ]);
+
+      expect(request.method()).to.be.equal('DELETE');
+    });
   });
 });
