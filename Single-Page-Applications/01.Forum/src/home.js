@@ -1,4 +1,3 @@
-//initialization
 //detatchment
 
 const container = document.querySelector('.container');
