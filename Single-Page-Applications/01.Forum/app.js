@@ -1,5 +1,4 @@
 import { showHome } from './src/home.js';
-import { showComments } from './src/comments.js';
 import { renderPosts } from './src/posts.js';
 
 //initialization

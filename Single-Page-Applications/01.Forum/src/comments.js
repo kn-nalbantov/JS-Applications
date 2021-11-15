@@ -1,13 +1,14 @@
 const container = document.querySelector('.container');
 
 export async function showComments(post) {
+  let timestamp = new Date();
   const comments = await getComments(post._id);
   const renderComments = comments
     .map(x => (x = `
   <div class="user-comment">
   <div class="topic-name-wrapper">
   <div class="topic-name">
-      <p><strong>${x.username}</strong> commented on <time>3/15/2021, 12:39:02 AM</time></p>
+      <p><strong>${x.username}</strong> commented on <time>${timestamp.toLocaleString()}</time></p>
       <div class="post-content">
           <p>${x.commentText}</p>
       </div>
@@ -35,7 +36,7 @@ export async function showComments(post) {
             <div class="comment">
                 <div class="header">
                     <img src="./static/profile.png" alt="avatar">
-                    <p><span>${post.username}</span> posted on <time>2020-10-10 12:08:28</time></p>
+                    <p><span>${post.username}</span> posted on <time>${timestamp.toLocaleString()}</time></p>
 
                     <p class="post-content">${post.postText}</p>
                 </div>

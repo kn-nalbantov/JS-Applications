@@ -2,6 +2,7 @@ import { showComments } from './comments.js';
 
 export function renderPosts(post) {
   const topics = document.querySelector('.topic-container');
+  let timestamp = new Date();
 
   const div = document.createElement('div');
   div.setAttribute('class', 'topic-name-wrapper');
@@ -12,7 +13,7 @@ export function renderPosts(post) {
             </a>
             <div class="columns">
                 <div>
-                    <p>Date: <time>2020-10-10T12:08:28.451Z</time></p>
+                    <p>Date: <time>${timestamp}</time></p>
                     <div class="nick-name">
                         <p>Username: <span>${post.username}</span></p>
                     </div>
