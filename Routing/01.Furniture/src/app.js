@@ -7,10 +7,12 @@ import { registerPage } from './register.js';
 import { html, render, page } from './util.js';
 
 page('/', catalogPage);
+page('/index', catalogPage);
 page('/details/:id', detailsPage);
 page('/edit', editPage);
 page('/create', createPage);
 page('/login', loginPage);
 page('/register', registerPage);
 page('/my-furniture', catalogPage);
+page('*', catalogPage);
 page.start();
