@@ -1,22 +1,51 @@
-import { html, render } from './util.js';
-import { catalogPage } from './catalog.js';
-import { showNav } from './nav.js';
+import { html } from './util.js';
 
-export function registerPage() {
-  displayRegister();
-  showNav();
+export function registerPage(ctx) {
+  ctx.render(template(onSubmit));
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    try {
+      const form = document.querySelector('form');
+      const email = form.email.value;
+      const password = form.password.value;
+      const rePass = form.rePass.value;
+      if (password != rePass) {
+        throw new Error("Passwords don't match!");
+      }
+      if (email == '' || password == '' || rePass == '') {
+        throw new Error('All fields are required!');
+      }
+      const res = await fetch('http://localhost:3030/users/register', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (res.status != 200) {
+        const error = await res.json();
+        throw new Error(error.message);
+      }
+      const data = await res.json();
+      sessionStorage.setItem('accessToken', data.accessToken);
+      ctx.updateUserNav();
+      ctx.page.redirect('/');
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
 }
 
-function displayRegister() {
-  const container = document.querySelector('.container');
-  const template = html`
+  const template = (onSubmit) => html`
     <div class="row space-top">
       <div class="col-md-12">
         <h1>Register New User</h1>
         <p>Please fill all fields.</p>
       </div>
     </div>
-    <form>
+    <form @submit=${onSubmit}>
       <div class="row space-top">
         <div class="col-md-4">
           <div class="form-group">
@@ -31,42 +60,10 @@ function displayRegister() {
             <label class="form-control-label" for="rePass">Repeat</label>
             <input class="form-control" id="rePass" type="password" name="rePass" />
           </div>
-          <input type="submit" class="btn btn-primary" value="Register" @click=${onSubmit} />
+          <input type="submit" class="btn btn-primary" value="Register" />
         </div>
       </div>
     </form>
   `;
-  render(template, container);
-}
 
-async function onSubmit(e) {
-  e.preventDefault();
-  try {
-    const form = document.querySelector('form');
-    const email = form.email.value;
-    const password = form.password.value;
-    const rePass = form.rePass.value;
-    if (password != rePass) {
-      throw new Error("Passwords don't match!");
-    }
-    if (email == '' || password == '' || rePass == '') {
-      throw new Error('All fields are required!');
-    }
-    const res = await fetch('http://localhost:3030/users/register', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-    if (res.status != 200) {
-      const error = await res.json();
-      throw new Error(error.message);
-    }
-    const data = await res.json();
-    sessionStorage.setItem('accessToken', data.accessToken);
-    catalogPage();
-  } catch (err) {
-    alert(err.message);
-  }
-}
+

@@ -1,16 +1,13 @@
 import { getDetails } from './data.js';
-import { showNav } from './nav.js';
 import { html, render } from './util.js';
 
 export function detailsPage(ctx) {
-  console.log(ctx.params.id);
   displayDetails(ctx.params.id);
-  showNav();
 }
 
 async function displayDetails(id) {
   const details = await getDetails(id);
-  console.log(details);
+  // console.log(details);
   const container = document.querySelector('.container');
   const template = data => html`
     <div class="row space-top">
@@ -22,7 +19,7 @@ async function displayDetails(id) {
       <div class="col-md-4">
         <div class="card text-white bg-primary">
           <div class="card-body">
-            <img src="${data.img}" />
+            <img src=".${data.img}" />
           </div>
         </div>
       </div>
@@ -34,11 +31,19 @@ async function displayDetails(id) {
         <p>Price: <span>${data.price}</span></p>
         <p>Material: <span>${data.material}</span></p>
         <div>
-          <a href="”#”" class="btn btn-info">Edit</a>
-          <a href="”#”" class="btn btn-red">Delete</a>
+          <a href="”#”" class="btn btn-info" @click=${onEdit}>Edit</a>
+          <a href="”#”" class="btn btn-red" @click=${onDelete}>Delete</a>
         </div>
       </div>
     </div>
   `;
   render(template(details), container);
+}
+
+function onEdit(e) {
+  e.preventDefault();
+}
+
+function onDelete(e) {
+  e.preventDefault();
 }

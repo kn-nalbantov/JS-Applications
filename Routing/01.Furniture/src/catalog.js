@@ -1,63 +1,50 @@
 import { getData } from './data.js';
-import { showNav } from './nav.js';
-import { html, render } from './util.js';
+import { html, until } from './util.js';
 
-export function catalogPage() {
-  displayCatalog();
-  showNav();
+export function catalogPage(ctx) {
+  const userpage = ctx.pathname == '/my-furniture';
+  ctx.render(template(loadItems(userpage), userpage));
 }
 
-async function displayCatalog() {
-  const furniture = await getData();
-  console.log(furniture);
-  const container = document.querySelector('.container');
-  const template = data => html`
-    <div class="row space-top">
-      <div class="col-md-12">
-        <h1>Welcome to Furniture System</h1>
-        <p>Select furniture from the catalog to view details.</p>
-      </div>
+const furniture = await getData();
+const template = (data, userpage) => html`
+  <div class="row space-top">
+    <div class="col-md-12">
+      ${userpage
+        ? html`<h1>My Furniture</h1>
+            <p>This is a list of your publications.</p>`
+        : html`<h1>Welcome to Furniture System</h1>
+            <p>Select furniture from the catalog to view details.</p>`}
     </div>
-    <div class="row space-top">
-      ${data.map(
-        item => html`
-          <div class="col-md-4">
-            <div class="card text-white bg-primary">
-              <div class="card-body">
-                <img src="${item.img}" />
-                <p>${item.description}</p>
-                <footer>
-                  <p>Price: <span>${item.price} $</span></p>
-                </footer>
-                <div>
-                  <a href="details/${item._id}" class="btn btn-info">Details</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        `
-      )}
-    </div>
-  `;
-  render(template(furniture), container);
-}
+  </div>
+  <div class="row space-top">${until(data)}</div>
+`;
 
-/*
-
-<div class="col-md-4">
-        <div class="card text-white bg-primary">
-          <div class="card-body">
-            <img src="./images/table.png" />
-            <p>Description here</p>
-            <footer>
-              <p>Price: <span>235 $</span></p>
-            </footer>
-            <div>
-              <a href="#" class="btn btn-info">Details</a>
-            </div>
-          </div>
+const itemTemplate = item => html`
+  <div class="col-md-4">
+    <div class="card text-white bg-primary">
+      <div class="card-body">
+        <img src="${item.img}" />
+        <p>${item.description}</p>
+        <footer>
+          <p>Price: <span>${item.price} $</span></p>
+        </footer>
+        <div>
+          <a href="details/${item._id}" class="btn btn-info">Details</a>
         </div>
       </div>
+    </div>
+  </div>
+`;
 
+async function loadItems(userpage) {
+  let items = [];
+  if (userpage) {
+    //get by owner id
+  } else {
+    items = await getData();
+  }
 
-*/
+  return items.map(itemTemplate);
+}
+
