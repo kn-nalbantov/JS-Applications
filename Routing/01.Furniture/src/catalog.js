@@ -1,4 +1,4 @@
-import { getData } from './data.js';
+import { getData, getDataByOwnerId } from './data.js';
 import { html, until } from './util.js';
 
 export function catalogPage(ctx) {
@@ -6,7 +6,6 @@ export function catalogPage(ctx) {
   ctx.render(template(loadItems(userpage), userpage));
 }
 
-const furniture = await getData();
 const template = (data, userpage) => html`
   <div class="row space-top">
     <div class="col-md-12">
@@ -40,11 +39,11 @@ const itemTemplate = item => html`
 async function loadItems(userpage) {
   let items = [];
   if (userpage) {
-    //get by owner id
+    const ownerId = JSON.parse(sessionStorage.userData)._id;
+    items = await getDataByOwnerId(ownerId);
   } else {
     items = await getData();
   }
 
   return items.map(itemTemplate);
 }
-

@@ -25,7 +25,7 @@ export function loginPage(ctx) {
         throw new Error(error.message);
       }
       const data = await res.json();
-      sessionStorage.setItem('accessToken', data.accessToken);
+      sessionStorage.setItem('userData', JSON.stringify(data));
       ctx.updateUserNav();
       ctx.page.redirect('/');
     } catch (err) {
@@ -57,4 +57,3 @@ const template = onSubmit => html`
     </div>
   </form>
 `;
-
