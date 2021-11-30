@@ -1,5 +1,6 @@
 import * as api from './data.js';
 import { page, render } from './lib.js';
+import { allMemes } from './views/all-memes.js';
 import { homePage } from './views/home.js';
 
 /* debug */
@@ -9,6 +10,7 @@ const root = document.querySelector('main');
 
 page(decorateContext);
 page('/', homePage);
+page('/all-memes', allMemes);
 
 page.start();
 
