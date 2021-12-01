@@ -1,7 +1,12 @@
 import { html } from '../lib.js';
+import { getUserData } from '../util.js';
 
 export function homePage(ctx) {
-  ctx.render(homeTemplate());
+  if (getUserData()) {
+    ctx.page.redirect('/all-memes');
+  } else {
+    ctx.render(homeTemplate());
+  }
 }
 
 const homeTemplate = () => html`

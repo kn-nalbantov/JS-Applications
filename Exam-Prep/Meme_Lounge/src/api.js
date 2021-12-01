@@ -73,7 +73,7 @@ export async function login(email, password) {
 }
 
 export async function register(username, email, password, gender) {
-  const result = await post('/user/register', { username, email, password, gender });
+  const result = await post('/users/register', { username, email, password, gender });
 
   const userData = {
     username: result.username,
