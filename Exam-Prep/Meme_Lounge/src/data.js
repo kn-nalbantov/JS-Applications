@@ -9,7 +9,7 @@ export async function getAllMemes() {
 }
 
 export async function createMeme(meme) {
-    return api.post('/data/memes/', meme);
+    return api.post('/data/memes', meme);
 }
 
 export async function getMemeById(id) {

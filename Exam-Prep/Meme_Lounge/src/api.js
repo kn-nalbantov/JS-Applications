@@ -1,6 +1,6 @@
 import { clearUserData, getUserData, setUserData } from './util.js';
 
-const hostname = 'http://localhost:3030' //LIVE SERVER extension
+const hostname = 'http://localhost:3030' //REST API
 
 async function request(url, options) {
   try {
