@@ -5,8 +5,10 @@ import { clearUserData, getUserData } from './util.js';
 import { allMemes } from './views/all-memes.js';
 import { createPage } from './views/create.js';
 import { detailsPage } from './views/details.js';
+import { editPage } from './views/edit.js';
 import { homePage } from './views/home.js';
 import { loginPage } from './views/login.js';
+import { profilePage } from './views/profile.js';
 import { registerPage } from './views/register.js';
 
 /* debug */
@@ -22,7 +24,9 @@ page('/login', loginPage);
 page('/register', registerPage);
 page('/create', createPage);
 page('/details/:id', detailsPage);
-page('/edit/:id', (ctx) => console.log(ctx.params.id));
+page('/edit/:id', editPage);
+page('/profile', profilePage);
+page('*', homePage);
 
 updateUserNav();
 page.start();
@@ -37,6 +41,8 @@ function decorateContext(ctx, next) {
 function onLogout() {
     logout();
     clearUserData();
+    updateUserNav();
+    page.redirect('/');
 }
 
 function updateUserNav() {
