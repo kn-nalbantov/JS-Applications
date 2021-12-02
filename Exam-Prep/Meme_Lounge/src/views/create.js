@@ -1,5 +1,6 @@
 import { createMeme } from '../data.js';
 import { html } from '../lib.js';
+import { notify } from '../notify.js';
 
 export function createPage(ctx) {
   ctx.render(createTemplate(onSubmit));
@@ -13,7 +14,7 @@ export function createPage(ctx) {
     const imageUrl = formData.get('imageUrl');
 
     if (title == '' || description == '' || imageUrl == '') {
-        return alert('All fields are required!');
+        return notify('All fields are required!');
     }
 
     await createMeme({ title, description, imageUrl });

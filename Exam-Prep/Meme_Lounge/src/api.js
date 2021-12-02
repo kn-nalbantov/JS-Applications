@@ -1,3 +1,4 @@
+import { notify } from './notify.js';
 import { clearUserData, getUserData, setUserData } from './util.js';
 
 const hostname = 'http://localhost:3030' //REST API
@@ -17,7 +18,7 @@ async function request(url, options) {
       return res;
     }
   } catch (err) {
-    alert(err.message);
+    notify(err.message);
     throw err;
   }
 }
