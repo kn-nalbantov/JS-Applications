@@ -27,7 +27,7 @@ page('/create', createPage);
 page('/details/:id', detailsPage);
 page('/edit/:id', editPage);
 page('/profile', profilePage);
-page('/search/:search', searchPage);
+page('/search', searchPage);
 
 updateUserNav();
 page.start();

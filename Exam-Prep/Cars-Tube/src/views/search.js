@@ -2,18 +2,26 @@ import { getListingsBySearchQuery } from '../data.js';
 import { html } from '../lib.js';
 
 export async function searchPage(ctx) {
-  const query = ctx.params.search;
-  const data = await getListingsBySearchQuery(query);
-  ctx.render(searchTemplate(query, data));
+  const params = ctx.querystring.split('=')[1];
+  let data = [];
+  if (params) {
+    data = await getListingsBySearchQuery(decodeURIComponent(params));
+  }
+  ctx.render(searchTemplate(params, data, onSearch));
+
+  async function onSearch(e) {
+    const search = e.target.parentNode.children[0].value;
+    ctx.page.redirect('/search?query=' + encodeURIComponent(search));
+  }
 }
 
-const searchTemplate = (query, data) => html`
+const searchTemplate = (params = '', data, onSearch) => html`
   <section id="search-cars">
     <h1>Filter by year</h1>
 
     <div class="container">
-      <input id="search-input" type="text" name="search" value=${query} />
-      <button class="button-list searchBtn">Search</button>
+      <input id="search-input" type="text" name="search" value=${params} />
+      <button class="button-list searchBtn" @click=${onSearch}>Search</button>
     </div>
 
     <h2>Results:</h2>

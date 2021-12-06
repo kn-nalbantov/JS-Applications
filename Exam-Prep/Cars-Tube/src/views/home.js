@@ -1,9 +1,8 @@
 import { html } from '../lib.js';
-import { searchBar } from './search-bar.js';
 
 export async function homePage(ctx) {
   ctx.updateUserNav();  
-  ctx.render([homeTemplate, searchBar]);
+  ctx.render(homeTemplate);
 }
 
 const homeTemplate = html`

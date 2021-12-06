@@ -1,11 +1,10 @@
 import { getAllListings } from '../data.js';
 import { html } from '../lib.js';
-import { searchBar } from './search-bar.js';
 
 export async function listingsPage(ctx) {
   const data = await getAllListings();
   ctx.updateUserNav();
-  ctx.render([listingsTemplate(data), searchBar]);
+  ctx.render(listingsTemplate(data));
 }
 
 const listingsTemplate = data => html`

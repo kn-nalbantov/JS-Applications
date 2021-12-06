@@ -29,5 +29,5 @@ export async function getListingsByUserId(userId) {
 }
 
 export async function getListingsBySearchQuery(query) {
-  return api.get(`/data/cars?where=year%3D${query}`);
+  return api.get(`/data/cars?where=year%3D${encodeURIComponent(query)}`);
 }
